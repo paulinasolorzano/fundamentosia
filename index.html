@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Simulador educativo de lógica proposicional e inferencias mediante un invernadero inteligente">
+  <title>Invernadero IA | Laboratorio de inferencias</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23112f2a'/%3E%3Cpath d='M15 38c14 2 25-6 34-22 2 19-4 32-22 32' fill='%237bd88f'/%3E%3Cpath d='M18 49c8-13 17-20 29-28' stroke='%23effbf2' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Inicio">
+      <span class="brand-mark" aria-hidden="true">⌁</span>
+      <span>Invernadero <strong>IA</strong></span>
+    </a>
+    <nav aria-label="Navegación principal">
+      <a href="#simulador">Simulador</a>
+      <a href="#reglas">Reglas</a>
+      <a href="#casos">Casos</a>
+      <a href="#reto">Reto</a>
+    </nav>
+  </header>
+
+  <main id="inicio">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">Laboratorio de IA simbólica</p>
+        <h1>Convierte datos en decisiones.</h1>
+        <p class="lead">Modifica los sensores y observa cómo las proposiciones activan reglas, producen inferencias y generan acciones.</p>
+      </div>
+      <div class="logic-strip" aria-label="Flujo de aprendizaje">
+        <span>Datos</span><b>→</b><span>Proposiciones</span><b>→</b><span>Reglas</span><b>→</b><span>Inferencias</span>
+      </div>
+    </section>
+
+    <section id="simulador" class="workspace" aria-labelledby="sim-title">
+      <div class="section-heading">
+        <div><p class="step">01 · Experimenta</p><h2 id="sim-title">Panel de sensores</h2></div>
+        <button id="resetBtn" class="ghost-btn" type="button">Restablecer</button>
+      </div>
+
+      <div class="sim-grid">
+        <form class="sensor-panel" id="sensorForm">
+          <label class="sensor-card" for="humedad">
+            <span><b>Humedad de la tierra</b><small>Menor a 30 % = tierra seca</small></span>
+            <output id="humedadValue" for="humedad">22 %</output>
+            <input id="humedad" type="range" min="0" max="100" value="22">
+          </label>
+          <label class="sensor-card" for="temperatura">
+            <span><b>Temperatura</b><small>Mayor a 30 °C = temperatura alta</small></span>
+            <output id="temperaturaValue" for="temperatura">34 °C</output>
+            <input id="temperatura" type="range" min="5" max="50" value="34">
+          </label>
+          <label class="sensor-card" for="tanque">
+            <span><b>Nivel del tanque</b><small>Mayor a 20 % = tiene agua</small></span>
+            <output id="tanqueValue" for="tanque">65 %</output>
+            <input id="tanque" type="range" min="0" max="100" value="65">
+          </label>
+          <div class="toggle-row">
+            <label class="toggle-card"><span><b>¿Está lloviendo?</b><small>Sensor de lluvia</small></span><input id="llueve" type="checkbox"><i aria-hidden="true"></i></label>
+            <label class="toggle-card"><span><b>¿Hay una persona?</b><small>Sensor de presencia</small></span><input id="persona" type="checkbox"><i aria-hidden="true"></i></label>
+          </div>
+        </form>
+
+        <div class="result-panel" aria-live="polite">
+          <div class="result-head"><span class="live-dot"></span><span>Evaluación en tiempo real</span></div>
+          <h3>Proposiciones</h3>
+          <div id="propositions" class="chips"></div>
+          <h3>Cadena de inferencia</h3>
+          <ol id="inferenceList" class="inference-list"></ol>
+          <div class="action-block">
+            <p>Acciones finales</p>
+            <div id="actions" class="actions"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="reglas" class="content-section" aria-labelledby="rules-title">
+      <div class="section-heading"><div><p class="step">02 · Comprende</p><h2 id="rules-title">Base de conocimiento</h2></div></div>
+      <p class="section-copy">Una regla se activa solamente cuando todas sus condiciones son verdaderas. Una conclusión puede utilizarse como condición de la siguiente regla.</p>
+      <div id="rulesGrid" class="rules-grid"></div>
+    </section>
+
+    <section id="casos" class="content-section" aria-labelledby="cases-title">
+      <div class="section-heading"><div><p class="step">03 · Comprueba</p><h2 id="cases-title">Casos de prueba</h2></div><div class="score" id="score">0 / 5 comprobados</div></div>
+      <p class="section-copy">Predice la acción antes de ejecutar cada caso. Después compara tu razonamiento con el resultado del motor.</p>
+      <div id="caseGrid" class="case-grid"></div>
+    </section>
+
+    <section id="reto" class="challenge" aria-labelledby="challenge-title">
+      <div><p class="step">04 · Construye</p><h2 id="challenge-title">Reto para programar</h2></div>
+      <div class="challenge-grid">
+        <article><span>1</span><h3>Agrega una proposición</h3><p>Por ejemplo, “la humedad ambiental es alta”. Define de qué dato se obtiene.</p></article>
+        <article><span>2</span><h3>Diseña dos reglas</h3><p>Al menos una debe usar como condición la conclusión de otra regla.</p></article>
+        <article><span>3</span><h3>Prueba los extremos</h3><p>Crea un caso sin acciones y otro con reglas que puedan entrar en conflicto.</p></article>
+      </div>
+      <details>
+        <summary>Preguntas para entregar</summary>
+        <ol>
+          <li>¿Qué datos se transformaron en proposiciones?</li>
+          <li>¿Qué regla se activó primero y por qué?</li>
+          <li>¿Qué conclusión intermedia activó otra regla?</li>
+          <li>¿Qué limitación tiene este sistema?</li>
+          <li>¿El programa aprendió o solamente aplicó reglas? Justifica.</li>
+        </ol>
+      </details>
+    </section>
+  </main>
+
+  <footer><p>Fundamentos de Inteligencia Artificial · Práctica de lógica proposicional e inferencias</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>
