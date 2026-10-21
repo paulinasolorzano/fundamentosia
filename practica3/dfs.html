@@ -1,10 +1,207 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DFS explicado paso a paso</title><link rel="stylesheet" href="estilo.css"></head><body data-algorithm="dfs"><header><a href="index.html">Aprender a buscar</a><nav aria-label="Prácticas"><a href="bfs.html">BFS</a><a href="dfs.html">DFS</a><a href="astar.html">A*</a></nav></header><main><p class="tag">Práctica 2 · 40–50 minutos · En parejas</p><h1>DFS: seguir una posibilidad hasta el final</h1><p class="lead">Elige un camino y sigue explorándolo. Cuando no quedan opciones nuevas, retoma otra posibilidad que dejó pendiente.</p><p>Al terminar podrás explicar cómo decide, reconocer un uso real y ejecutar un programa pequeño.</p>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DFS explicado paso a paso</title><style>*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f5f3ed;color:#203d43;font:18px/1.6 system-ui,sans-serif}a{color:#126b61}header{padding:18px 6%;border-bottom:1px solid #d4dcd6;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}nav{display:flex;gap:22px}main{max-width:1100px;margin:auto;padding:45px 25px}h1{font-size:clamp(38px,6vw,68px);line-height:1.08;letter-spacing:-2px;max-width:850px}h2{font-size:30px;line-height:1.2}h3{font-size:20px}.tag{font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#126b61}.lead{font-size:24px;max-width:800px}section{padding:25px 0 35px;border-bottom:1px solid #d4dcd6}.note{background:#e4eee6;padding:18px 22px;border-left:4px solid #126b61}.cols{display:grid;grid-template-columns:1fr 1fr;gap:30px}.panel{background:white;border:1px solid #d4dcd6;padding:22px;border-radius:12px}button,select{font:inherit;padding:10px 14px;border:1px solid #99aaa3;border-radius:7px;background:white;color:inherit;cursor:pointer}button.primary{background:#126b61;color:white}button:disabled{opacity:.4;cursor:default}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #bd7932;outline-offset:3px}.tools{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;max-width:380px;margin:20px auto}.cell{aspect-ratio:1;padding:0;font-weight:bold;border:1px solid #99aaa3}.wall{background:#203d43;color:white}.pending{background:#f4d899}.seen{background:#dce8e0}.route{background:#126b61;color:white}.active{outline:3px solid #bd7932;outline-offset:-4px}pre{background:#182e34;color:#eaf4ee;padding:20px;border-radius:10px;overflow:auto;font:14px/1.65 monospace;max-height:480px}table{border-collapse:collapse;width:100%}td,th{text-align:left;padding:12px 8px;border-bottom:1px solid #d4dcd6;vertical-align:top}li{margin:10px 0}summary{cursor:pointer;font-weight:bold}footer{padding:30px 6%;font-size:14px}.pill{display:inline-block;background:#e4eee6;border-radius:30px;padding:6px 14px;font-size:14px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.cards a{display:block;text-decoration:none}.small{font-size:14px}textarea{width:100%;min-height:95px;font:inherit;padding:10px;border:1px solid #99aaa3;border-radius:7px}@media(max-width:700px){.cols,.cards{grid-template-columns:1fr}main{padding:25px 18px}h1{letter-spacing:-1px}table{font-size:15px}.lead{font-size:21px}header{padding:14px 18px}}@media print{button,nav,.tools{display:none}pre{max-height:none;white-space:pre-wrap}section{break-inside:avoid}}.graph{width:100%;height:auto;display:block;min-width:0}.graph .edge{stroke:#b4c3bf;stroke-width:4}.graph .edge.off{stroke-dasharray:7 7;opacity:.35}.graph .edge.onroute{stroke:#126b61;stroke-width:7}.graph .node circle{fill:#fff;stroke:#819c94;stroke-width:2}.graph .node.pending circle{fill:#f4d899}.graph .node.seen circle{fill:#dce8e0}.graph .node.route circle{fill:#126b61}.graph .node.active circle{stroke:#bd7932;stroke-width:5}.graph text{font-family:system-ui,sans-serif;fill:#203d43;text-anchor:middle;font-size:19px;font-weight:700}.graph .route text{fill:white}.graph .caption{font-size:13px;font-weight:400}.graph .edge-cost{font-size:12px;fill:#526a64}.graph-panel{padding:14px}.trace{font-family:monospace;overflow-wrap:anywhere}.tokens{display:flex;gap:8px;flex-wrap:wrap}.token{background:#e4eee6;border:1px solid #a8bdb4;border-radius:7px;padding:6px 12px}.tokens .token:first-child{border:2px solid #bd7932}.graph-wrap{max-width:820px;margin:auto}.wide{grid-template-columns:1.25fr 1fr}.stepnav{display:flex;gap:15px;flex-wrap:wrap;margin:25px 0}.stepnav a{font-size:15px}.edge-controls{display:flex;gap:8px;flex-wrap:wrap}.edge-controls button[aria-pressed="false"]{text-decoration:line-through;opacity:.6}.graph-key{font-size:14px;line-height:1.6}.intro-diagram{font-size:20px;padding:20px;border:1px solid #c7d4cd;background:white;border-radius:12px}.answers textarea{display:block;margin-bottom:18px}.tree-list{font-family:monospace;white-space:pre-wrap;background:#edf1e9;padding:16px;border-radius:9px}.pending-table{font-size:15px}section[id]{scroll-margin-top:15px}@media(max-width:700px){.wide{grid-template-columns:1fr}.graph text{font-size:20px}.graph .caption{font-size:15px}}
+#actividad textarea{margin:10px 0 24px}article p{margin:14px 0}.panel h3{line-height:1.35}section>p,section>ol,section>ul{max-width:900px}details{margin:22px 0}details p,details li{max-width:850px}summary{padding:8px 0}.graph-key{margin:12px 0}.cols article{height:100%}label{line-height:1.5}h2{margin-top:12px}
+</style></head><body data-algorithm="dfs"><header><a href="index.html">Aprender a buscar</a><nav aria-label="Prácticas"><a href="bfs.html">BFS</a><a href="dfs.html">DFS</a><a href="astar.html">A*</a></nav></header><main><p class="tag">Práctica 2 · 40–50 minutos · En parejas</p><h1>DFS: seguir una posibilidad hasta el final</h1><p class="lead">Elige un camino y sigue explorándolo. Cuando no quedan opciones nuevas, retoma otra posibilidad que dejó pendiente.</p><p>Al terminar podrás explicar cómo decide, reconocer un uso real y ejecutar un programa pequeño.</p>
 <nav class="stepnav" aria-label="Secciones"><a href="#grafo">Entender el dibujo</a><a href="#explicacion">Explicación</a><a href="#simulador">Probar</a><a href="#casos">Usos reales</a><a href="#codigo">Programar</a><a href="#actividad">Entregar</a></nav>
 <section id="grafo"><h2>1. Primero entiende el dibujo</h2><p>Queremos ir de <strong>A, la entrada</strong>, a <strong>G, la biblioteca</strong>. Hay dos caminos principales: uno pasa por C y otro pasa por B, D, E y F.</p><div class="graph-wrap"><svg class="graph" viewBox="0 0 660 425" role="img" aria-label="Grafo del problema: A conectado con B y C; B con D y H; D con H y E; E con F; F con G; C con G."><title>De A, entrada, a G, biblioteca</title><line class="edge" x1="70" y1="205" x2="195" y2="80"/><text class="edge-cost" x="132.5" y="132.5">1</text><line class="edge" x1="70" y1="205" x2="195" y2="330"/><text class="edge-cost" x="132.5" y="257.5">1</text><line class="edge" x1="195" y1="80" x2="325" y2="80"/><text class="edge-cost" x="260.0" y="70.0">1</text><line class="edge" x1="195" y1="80" x2="325" y2="205"/><text class="edge-cost" x="260.0" y="132.5">1</text><line class="edge" x1="325" y1="80" x2="325" y2="205"/><text class="edge-cost" x="325.0" y="132.5">1</text><line class="edge" x1="325" y1="80" x2="455" y2="80"/><text class="edge-cost" x="390.0" y="70.0">1</text><line class="edge" x1="455" y1="80" x2="585" y2="160"/><text class="edge-cost" x="520.0" y="110.0">1</text><line class="edge" x1="585" y1="160" x2="585" y2="330"/><text class="edge-cost" x="585.0" y="235.0">1</text><line class="edge" x1="195" y1="330" x2="585" y2="330"/><text class="edge-cost" x="390.0" y="320.0">1</text><g class="node"><circle cx="70" cy="205" r="25"/><text x="70" y="212">A</text></g><text class="caption" x="70" y="253">Entrada</text><g class="node"><circle cx="195" cy="80" r="25"/><text x="195" y="87">B</text></g><g class="node"><circle cx="195" cy="330" r="25"/><text x="195" y="337">C</text></g><g class="node"><circle cx="325" cy="80" r="25"/><text x="325" y="87">D</text></g><g class="node"><circle cx="455" cy="80" r="25"/><text x="455" y="87">E</text></g><g class="node"><circle cx="585" cy="160" r="25"/><text x="585" y="167">F</text></g><g class="node"><circle cx="585" cy="330" r="25"/><text x="585" y="337">G</text></g><text class="caption" x="585" y="378">Biblioteca</text><g class="node"><circle cx="325" cy="205" r="25"/><text x="325" y="212">H</text></g></svg></div><div class="cols"><div><h3>Los círculos son nodos</h3><p>Cada letra identifica un lugar. A y C son dos nodos distintos. En este ejemplo no necesitas saber las coordenadas de esos lugares.</p><h3>Las líneas son conexiones</h3><p>Una línea entre A y C indica que puedes ir de uno al otro. El nombre formal de esa línea es <strong>arista</strong>.</p></div><div><h3>Todo el dibujo es un grafo</h3><p>Un grafo reúne nodos y conexiones. Como las líneas no tienen flechas, puedes moverte en ambos sentidos.</p><h3>Un camino une el inicio y la meta</h3><p>A → C → G es un camino. Tiene tres nodos y <strong>dos conexiones</strong>. La posición inicial no cuenta como movimiento.</p></div></div><p class="note">Cada conexión vale 1. Una línea larga y una corta valen lo mismo: este dibujo muestra qué lugares están conectados, no las distancias reales.</p><details><summary>¿Por qué le llamamos grafo y no árbol de decisión?</summary><p>Este grafo tiene caminos que se vuelven a unir y puede tener ciclos: B → D → H → B permite volver al punto de partida.</p><p>Un árbol no tiene ciclos. Un árbol de búsqueda muestra cómo se abren las alternativas desde el inicio. Un árbol de decisión es otro modelo, por ejemplo para clasificar mediante preguntas. Aquí usaremos la palabra grafo.</p></details><p><strong>Antes de seguir:</strong> señala un nodo, una conexión y la meta. Cuenta las conexiones de A → B → D → E → F → G.</p></section>
 <section id="explicacion"><h2>2. DFS, explicado paso a paso</h2><p>Imagina que exploras un escape room. En lugar de revisar un poco de cada zona, sigues una posibilidad para ver hasta dónde llega.</p><p>DFS guarda las opciones como una <strong>pila de platos</strong>: toma primero lo último que puso encima. En programación se llama <strong>pila</strong>.</p><ol><li><strong>Comienza en A.</strong> Guarda C y después B. B queda encima: se revisará primero.</li><li><strong>Revisa B.</strong> Guarda H y después D. D queda encima.</li><li><strong>Revisa D.</strong> Descubre E. H ya estaba guardado: no lo agrega otra vez.</li><li><strong>Revisa E, después F y después G.</strong> Ha seguido una rama hasta encontrar la meta.</li><li><strong>El camino encontrado es A → B → D → E → F → G.</strong> Tiene cinco conexiones.</li></ol><p class="note">Había una ruta de dos conexiones, A → C → G. DFS encontró primero una solución más larga. Encontrar una solución no significa encontrar la más corta.</p><p>Para observar qué pasa cuando no encuentra la meta, prueba «Biblioteca aislada». Verás que termina una rama y retoma los nodos que había dejado pendientes.</p><h3>¿Cuándo te conviene?</h3><p>Cuando quieres <strong>explorar posibilidades</strong> y no necesitas que la primera solución tenga el menor número de pasos.</p><p>En este grafo pequeño, si existe una ruta la encontrará. Recordar los nodos que ya descubrió evita repetirlos sin parar.</p></section>
-<section id="simulador"><h2>3. Ahora observa las decisiones</h2><p>Haz clic en <strong>Un paso</strong>. Cada clic revisa un nodo. La letra con borde naranja es el nodo que se acaba de revisar.</p><div class="cols wide"><div class="panel graph-panel"><label for="scenario">Elige qué quieres probar: </label><select id="scenario"><option value="base">Todos los caminos abiertos</option><option value="detour">Cerrar el paso C—G</option><option value="trapped">Biblioteca aislada</option></select><div id="graph"></div><p class="graph-key">Amarillo: descubierto, esperando turno.<br>Verde claro: ya revisado.<br>Verde oscuro: camino final.<br>Punteado: conexión cerrada.</p><details><summary>Quiero abrir o cerrar otro paso</summary><p>Pulsa el nombre de una conexión. La búsqueda vuelve a comenzar.</p><div id="edges" class="edge-controls"></div></details></div><div><div class="tools"><button id="back">Anterior</button><button id="next" class="primary">Un paso</button><button id="finish">Ver resultado</button><button id="reset">Volver al comienzo</button></div><p id="status" aria-live="polite"></p><p id="metrics"></p><h3>Los nodos que están esperando</h3><p id="structure"></p><div id="pending" class="tokens"></div><div id="priority"></div><h3>El orden en que se revisaron</h3><p id="reviewed" class="trace"></p><p class="note">Esta lista puede ser diferente del camino final. El programa prueba posibilidades en su memoria; el personaje recorrería después el camino encontrado.</p></div></div><details><summary>¿Cómo recuerda el programa el camino?</summary><p>Para cada nodo nuevo guarda desde dónde llegó. Por ejemplo: llegó a C desde A y llegó a G desde C. Al terminar, sigue esas notas hacia atrás y obtiene A → C → G.</p><div id="parents" class="tree-list"></div></details><details><summary>¿Cómo guarda las conexiones?</summary><p>Con una lista de vecinos. "A": ["B", "C"] significa que desde A se puede ir directamente a B y a C.</p><pre id="adjacency"></pre></details><p class="small">Para que el ejemplo se repita igual, usamos las letras en orden alfabético. En DFS las apilamos al revés para que la letra menor quede arriba. En A* comparamos primero la suma; si empatan, lo recorrido y después la letra.</p></section>
+<section id="simulador"><h2>3. Ahora observa las decisiones</h2><p>Haz clic en <strong>Un paso</strong>. Cada clic revisa un nodo. La letra con borde naranja es el nodo que se acaba de revisar.</p><div class="cols wide"><div class="panel graph-panel"><label for="scenario">Elige qué quieres probar: </label><select id="scenario"><option value="base">Todos los caminos abiertos</option><option value="detour">Cerrar el paso C—G</option><option value="trapped">Biblioteca aislada</option></select><div id="graph"><svg class="graph" viewBox="0 0 660 425" role="img" aria-label="Grafo del problema: A conectado con B y C; B con D y H; D con H y E; E con F; F con G; C con G."><title>De A, entrada, a G, biblioteca</title><line class="edge" x1="70" y1="205" x2="195" y2="80"/><text class="edge-cost" x="132.5" y="132.5">1</text><line class="edge" x1="70" y1="205" x2="195" y2="330"/><text class="edge-cost" x="132.5" y="257.5">1</text><line class="edge" x1="195" y1="80" x2="325" y2="80"/><text class="edge-cost" x="260.0" y="70.0">1</text><line class="edge" x1="195" y1="80" x2="325" y2="205"/><text class="edge-cost" x="260.0" y="132.5">1</text><line class="edge" x1="325" y1="80" x2="325" y2="205"/><text class="edge-cost" x="325.0" y="132.5">1</text><line class="edge" x1="325" y1="80" x2="455" y2="80"/><text class="edge-cost" x="390.0" y="70.0">1</text><line class="edge" x1="455" y1="80" x2="585" y2="160"/><text class="edge-cost" x="520.0" y="110.0">1</text><line class="edge" x1="585" y1="160" x2="585" y2="330"/><text class="edge-cost" x="585.0" y="235.0">1</text><line class="edge" x1="195" y1="330" x2="585" y2="330"/><text class="edge-cost" x="390.0" y="320.0">1</text><g class="node"><circle cx="70" cy="205" r="25"/><text x="70" y="212">A</text></g><text class="caption" x="70" y="253">Entrada</text><g class="node"><circle cx="195" cy="80" r="25"/><text x="195" y="87">B</text></g><g class="node"><circle cx="195" cy="330" r="25"/><text x="195" y="337">C</text></g><g class="node"><circle cx="325" cy="80" r="25"/><text x="325" y="87">D</text></g><g class="node"><circle cx="455" cy="80" r="25"/><text x="455" y="87">E</text></g><g class="node"><circle cx="585" cy="160" r="25"/><text x="585" y="167">F</text></g><g class="node"><circle cx="585" cy="330" r="25"/><text x="585" y="337">G</text></g><text class="caption" x="585" y="378">Biblioteca</text><g class="node"><circle cx="325" cy="205" r="25"/><text x="325" y="212">H</text></g></svg></div><p class="graph-key">Amarillo: descubierto, esperando turno.<br>Verde claro: ya revisado.<br>Verde oscuro: camino final.<br>Punteado: conexión cerrada.</p><details><summary>Quiero abrir o cerrar otro paso</summary><p>Pulsa el nombre de una conexión. La búsqueda vuelve a comenzar.</p><div id="edges" class="edge-controls"></div></details></div><div><div class="tools"><button id="back">Anterior</button><button id="next" class="primary">Un paso</button><button id="finish">Ver resultado</button><button id="reset">Volver al comienzo</button></div><p id="status" aria-live="polite"></p><p id="metrics"></p><h3>Los nodos que están esperando</h3><p id="structure"></p><div id="pending" class="tokens"></div><div id="priority"></div><h3>El orden en que se revisaron</h3><p id="reviewed" class="trace"></p><p class="note">Esta lista puede ser diferente del camino final. El programa prueba posibilidades en su memoria; el personaje recorrería después el camino encontrado.</p></div></div><details><summary>¿Cómo recuerda el programa el camino?</summary><p>Para cada nodo nuevo guarda desde dónde llegó. Por ejemplo: llegó a C desde A y llegó a G desde C. Al terminar, sigue esas notas hacia atrás y obtiene A → C → G.</p><div id="parents" class="tree-list"></div></details><details><summary>¿Cómo guarda las conexiones?</summary><p>Con una lista de vecinos. "A": ["B", "C"] significa que desde A se puede ir directamente a B y a C.</p><pre id="adjacency"></pre></details><p class="small">Para que el ejemplo se repita igual, usamos las letras en orden alfabético. En DFS las apilamos al revés para que la letra menor quede arriba. En A* comparamos primero la suma; si empatan, lo recorrido y después la letra.</p></section>
 <section id="casos"><h2>4. ¿En qué situaciones sirve?</h2><p>Los nodos no siempre son lugares. También pueden ser personas o situaciones de un juego. Estos son ejemplos de aplicación del algoritmo o de sus variantes.</p><div class="cols"><article class="panel"><h3>Resolver un sudoku probando y regresando</h3><p><strong>La situación:</strong> Pruebas un número en una casilla y continúas. Si llegas a una contradicción, regresas y pruebas otro número.</p><p><strong>Cómo lo representamos:</strong> Cada tablero parcial es un nodo. Colocar un número válido abre una nueva posibilidad. La búsqueda profundiza en esas decisiones.</p><p><strong>Para qué sirve:</strong> La técnica de retroceso puede organizarse como una búsqueda en profundidad. También necesita las reglas del sudoku; el código de abajo solo busca caminos.</p></article><article class="panel"><h3>Crear un laberinto diferente en cada partida</h3><p><strong>La situación:</strong> Quieres generar los pasillos de un juego para que no siempre sean iguales.</p><p><strong>Cómo lo representamos:</strong> Cada celda es un nodo. Una variante de DFS elige al azar una celda nueva, abre un paso y continúa. Si no puede seguir, regresa.</p><p><strong>Para qué sirve:</strong> Sirve para construir laberintos. Generarlo es una tarea distinta de encontrar después la salida.</p></article></div></section>
 <section><h2>5. ¿Qué tiene que ver con la IA?</h2><p>Un programa necesita elegir acciones para llegar a una meta. En vez de adivinar, representa las opciones y las explora con una regla.</p><p class="lead">DFS pertenece a la <strong>búsqueda y resolución de problemas</strong> dentro de la IA clásica.</p><p>Su categoría es <strong>búsqueda no informada: no usa una pista sobre lo que falta</strong>.</p><p>Esto puede ayudar a planear acciones en juegos o robots. El algoritmo no aprende de ejemplos: ejecuta reglas de búsqueda. También se utiliza en informática fuera de la IA.</p></section>
-<section id="codigo"><h2>6. Del dibujo al código Python</h2><p>No tienes que inventar todo el programa. El botón <strong>Generar código</strong> prepara un ejemplo completo con las conexiones que tienes abiertas ahora.</p><ol><li>Vuelve a «Todos los caminos abiertos».</li><li>Pulsa «Generar código». Mira primero la lista llamada <strong>grafo</strong>: las letras representan los nodos del dibujo.</li><li>Descarga el archivo. Necesitas Python 3 para ejecutarlo.</li><li>Compara el camino que imprime con el que viste en el simulador.</li></ol><div class="tools"><button id="generate" class="primary">Generar código</button><button id="download">Descargar .py</button><button id="copy">Copiar código</button></div><p id="codeStatus" aria-live="polite"></p><pre id="code" tabindex="0"></pre><details><summary>Las palabras del código, sin complicaciones</summary><ul><li><strong>grafo:</strong> guarda quién está conectado con quién.</li><li><strong>pendientes:</strong> guarda los nodos que esperan ser revisados.</li><li><strong>anterior:</strong> recuerda desde dónde llegamos a cada nodo.</li><li><strong>buscar:</strong> es la función que intenta encontrar un camino.</li><li><strong>reconstruir:</strong> recupera el camino usando las notas guardadas.</li><li><strong>None:</strong> indica que no se encontró un camino.</li></ul><p><strong>descubiertos</strong> evita guardar repetidamente el mismo nodo. <strong>append</strong> pone una opción encima de la pila y <strong>pop</strong> saca la de arriba.</p></details><details><summary>Cómo ejecutar el archivo</summary><ol><li>Instala Python 3 desde <a href="https://www.python.org/downloads/">su página oficial</a> si todavía no lo tienes.</li><li>Guarda el archivo descargado en una carpeta y abre una terminal en esa carpeta.</li><li>En Windows escribe <code>py dfs_practica.py</code>. En macOS o Linux escribe <code>python3 dfs_practica.py</code>. Pulsa Enter.</li><li>Si no encuentra el archivo, revisa que la terminal esté en la carpeta donde lo guardaste.</li></ol><p>La página muestra una simulación. El programa Python se ejecuta en tu equipo.</p></details></section>
+<section id="codigo"><h2>6. Del dibujo al código Python</h2><p>No tienes que inventar todo el programa. El botón <strong>Generar código</strong> prepara un ejemplo completo con las conexiones que tienes abiertas ahora.</p><ol><li>Vuelve a «Todos los caminos abiertos».</li><li>Pulsa «Generar código». Mira primero la lista llamada <strong>grafo</strong>: las letras representan los nodos del dibujo.</li><li>Descarga el archivo. Necesitas Python 3 para ejecutarlo.</li><li>Compara el camino que imprime con el que viste en el simulador.</li></ol><div class="tools"><button id="generate" class="primary">Generar código</button><button id="download">Descargar .py</button><button id="copy">Copiar código</button></div><p><a href="dfs_practica.py" download="dfs_practica.py">Descargar directamente el programa del grafo original</a></p><p id="codeStatus" aria-live="polite"></p><pre id="code" tabindex="0"># DFS · Buscar de A a G en un grafo no dirigido.
+# Cada conexión cuesta 1. Los vecinos se consideran alfabéticamente.
+def reconstruir(anterior, nodo):
+    ruta = []
+    while nodo is not None:
+        ruta.append(nodo)
+        nodo = anterior[nodo]
+    return ruta[::-1]
+
+
+def buscar(grafo, inicio, meta):
+    pendientes = [inicio]
+    descubiertos = {inicio}
+    anterior = {inicio: None}
+    while pendientes:
+        actual = pendientes.pop()
+        if actual == meta:
+            return reconstruir(anterior, actual)
+        # Apilar al revés permite explorar primero la letra menor.
+        for vecino in sorted(grafo[actual], reverse=True):
+            if vecino not in descubiertos:
+                descubiertos.add(vecino)
+                anterior[vecino] = actual
+                pendientes.append(vecino)
+    return None
+
+
+grafo = {
+    &quot;A&quot;: [
+        &quot;B&quot;,
+        &quot;C&quot;
+    ],
+    &quot;B&quot;: [
+        &quot;A&quot;,
+        &quot;D&quot;,
+        &quot;H&quot;
+    ],
+    &quot;C&quot;: [
+        &quot;A&quot;,
+        &quot;G&quot;
+    ],
+    &quot;D&quot;: [
+        &quot;B&quot;,
+        &quot;E&quot;,
+        &quot;H&quot;
+    ],
+    &quot;E&quot;: [
+        &quot;D&quot;,
+        &quot;F&quot;
+    ],
+    &quot;F&quot;: [
+        &quot;E&quot;,
+        &quot;G&quot;
+    ],
+    &quot;G&quot;: [
+        &quot;C&quot;,
+        &quot;F&quot;
+    ],
+    &quot;H&quot;: [
+        &quot;B&quot;,
+        &quot;D&quot;
+    ]
+}
+
+if __name__ == &quot;__main__&quot;:
+    ruta = buscar(grafo, &quot;A&quot;, &quot;G&quot;)
+    if ruta is None:
+        print(&quot;No existe una ruta de A a G.&quot;)
+    else:
+        print(&quot;Ruta:&quot;, &quot; -&gt; &quot;.join(ruta))
+        print(&quot;Conexiones:&quot;, len(ruta) - 1)
+</pre><details><summary>Las palabras del código, sin complicaciones</summary><ul><li><strong>grafo:</strong> guarda quién está conectado con quién.</li><li><strong>pendientes:</strong> guarda los nodos que esperan ser revisados.</li><li><strong>anterior:</strong> recuerda desde dónde llegamos a cada nodo.</li><li><strong>buscar:</strong> es la función que intenta encontrar un camino.</li><li><strong>reconstruir:</strong> recupera el camino usando las notas guardadas.</li><li><strong>None:</strong> indica que no se encontró un camino.</li></ul><p><strong>descubiertos</strong> evita guardar repetidamente el mismo nodo. <strong>append</strong> pone una opción encima de la pila y <strong>pop</strong> saca la de arriba.</p></details><details><summary>Cómo ejecutar el archivo</summary><ol><li>Instala Python 3 desde <a href="https://www.python.org/downloads/">su página oficial</a> si todavía no lo tienes.</li><li>Guarda el archivo descargado en una carpeta y abre una terminal en esa carpeta.</li><li>En Windows escribe <code>py dfs_practica.py</code>. En macOS o Linux escribe <code>python3 dfs_practica.py</code>. Pulsa Enter.</li><li>Si no encuentra el archivo, revisa que la terminal esté en la carpeta donde lo guardaste.</li></ol><p>La página muestra una simulación. El programa Python se ejecuta en tu equipo.</p></details></section>
 <section id="actividad"><h2>7. Tu actividad: tres pruebas pequeñas</h2><table><tr><th>Prueba</th><th>Qué debes hacer</th><th>Qué observar</th></tr><tr><td>1. Caminos abiertos</td><td>Predice la ruta y avanza un paso a la vez.</td><td>¿Qué nodo revisa después? ¿Por qué?</td></tr><tr><td>2. Cerrar C—G</td><td>Elige ese escenario y busca otra vez.</td><td>¿Puede llegar a G? ¿Cuántas conexiones usa?</td></tr><tr><td>3. Biblioteca aislada</td><td>Elige ese escenario y observa el resultado.</td><td>¿Por qué no puede llegar aunque revise otros nodos?</td></tr></table><p><strong>Después:</strong> vuelve al primer escenario, genera el programa y comprueba el resultado en Python.</p><label for="answer1">Explica cómo elige DFS el siguiente nodo. Usa un paso del simulador como ejemplo.</label><textarea id="answer1"></textarea><label for="answer2">Elige un caso que te interese. ¿Qué serían los nodos, las conexiones y la meta? ¿Qué resolvería?</label><textarea id="answer2"></textarea><label for="answer3">¿A qué área de la IA pertenece? ¿Siempre encuentra el camino más corto? Explica con tus palabras.</label><textarea id="answer3"></textarea><button id="notes">Descargar mis respuestas</button><p class="small">Entrega tu dibujo, las tres respuestas y el archivo Python. Descarga las respuestas para conservarlas.</p></section>
-<section><h2>Para recordar</h2><table><tr><th>BFS</th><th>DFS</th><th>A*</th></tr><tr><td>Primero lo que está a menos pasos del inicio.</td><td>Sigue una posibilidad y después retoma otras.</td><td>Suma lo recorrido y una pista de lo que falta.</td></tr></table><p><a href="index.html">Volver a las tres prácticas</a></p></section></main><footer>Para seguir aprendiendo: <a href="https://inst.eecs.berkeley.edu/~cs188/textbook/search/uninformed.html">Búsquedas sin pistas</a> y <a href="https://inst.eecs.berkeley.edu/~cs188/textbook/search/informed.html">Búsquedas con pistas · UC Berkeley</a>. Las prácticas funcionan sin internet; los enlaces externos requieren conexión.</footer><script src="grafo.js"></script></body></html>
+<section><h2>Para recordar</h2><table><tr><th>BFS</th><th>DFS</th><th>A*</th></tr><tr><td>Primero lo que está a menos pasos del inicio.</td><td>Sigue una posibilidad y después retoma otras.</td><td>Suma lo recorrido y una pista de lo que falta.</td></tr></table><p><a href="index.html">Volver a las tres prácticas</a></p></section><noscript><p class="note">El grafo y la explicación están disponibles. Para utilizar los botones, abre este archivo en un navegador que permita JavaScript.</p></noscript></main><footer>Para seguir aprendiendo: <a href="https://inst.eecs.berkeley.edu/~cs188/textbook/search/uninformed.html">Búsquedas sin pistas</a> y <a href="https://inst.eecs.berkeley.edu/~cs188/textbook/search/informed.html">Búsquedas con pistas · UC Berkeley</a>. Las prácticas funcionan sin internet; los enlaces externos requieren conexión.</footer><script>'use strict';
+const algorithm=document.body.dataset.algorithm, $=id=>document.getElementById(id);
+const positions={A:[70,205],B:[195,80],C:[195,330],D:[325,80],E:[455,80],F:[585,160],G:[585,330],H:[325,205]};
+const allEdges=[['A','B'],['A','C'],['B','D'],['B','H'],['D','H'],['D','E'],['E','F'],['F','G'],['C','G']];
+const hints={A:2,B:3,C:1,D:3,E:2,F:1,G:0,H:4};
+let enabled=allEdges.map(()=>true),frames=[],tick=0,generated='';
+function graphData(){const g=Object.fromEntries(Object.keys(positions).map(n=>[n,[]]));allEdges.forEach(([a,b],i)=>{if(enabled[i]){g[a].push(b);g[b].push(a);}});for(const ns of Object.values(g))ns.sort();return g;}
+const cmp=(a,b)=>a.f-b.f||a.g-b.g||a.node.localeCompare(b.node);
+function search(){
+ const graph=graphData(),result=[],parent={A:null},best={A:0},discovered=new Set(['A']),reviewed=[];
+ let frontier=[{node:'A',g:0,f:hints.A}];
+ function snap(actual,path,text){result.push({frontier:frontier.map(x=>({...x})),reviewed:[...reviewed],parent:{...parent},actual,path,text});}
+ snap(null,[],'El nodo A está pendiente. Todavía no se ha revisado ningún nodo.');
+ while(frontier.length){
+  if(algorithm==='astar')frontier.sort(cmp);
+  const current=algorithm==='dfs'?frontier.pop():frontier.shift();
+  const {node,g}=current;
+  if(algorithm==='astar'&&g!==best[node])continue;
+  reviewed.push(node);
+  if(node==='G'){const path=[];let n=node;while(n!==null){path.push(n);n=parent[n];}path.reverse();snap(node,path,`Meta encontrada. Ruta: ${path.join(' → ')}. Costo: ${path.length-1} conexiones.`);return result;}
+  let ns=[...graph[node]];if(algorithm==='dfs')ns.reverse();const added=[];
+  for(const next of ns){const cost=g+1;if(algorithm==='astar'?cost>=(best[next]??Infinity):discovered.has(next))continue;
+   discovered.add(next);best[next]=cost;parent[next]=node;frontier.push({node:next,g:cost,f:cost+hints[next]});added.push(next);
+  }
+  if(algorithm==='astar')frontier.sort(cmp);
+  snap(node,[],`Se revisa ${node}. ${added.length?'Se guardan '+added.join(', ')+'.':'No hay vecinos nuevos que guardar.'} ${algorithm==='dfs'?'La última opción guardada se revisa primero.':algorithm==='bfs'?'Los nuevos vecinos esperan al final de la cola.':'La próxima elección usa el menor f entre todas las pendientes.'}`);
+ }
+ snap(null,[],'No existe una ruta hasta G: se agotaron las opciones pendientes.');return result;
+}
+function draw(s){
+ const edges=allEdges.map(([a,b],i)=>{const [x1,y1]=positions[a],[x2,y2]=positions[b];const route=s.path.some((n,j)=>j&&((s.path[j-1]===a&&n===b)||(s.path[j-1]===b&&n===a)));return `<line class="edge ${enabled[i]?'':'off'} ${route?'onroute':''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>${enabled[i]?`<text class="edge-cost" x="${(x1+x2)/2}" y="${(y1+y2)/2-10}">1</text>`:''}`;}).join('');
+ const nodes=Object.entries(positions).map(([n,[x,y]])=>{const state=s.path.includes(n)?'route':s.reviewed.includes(n)?'seen':s.frontier.some(v=>v.node===n)?'pending':'';return `<g class="node ${state} ${s.actual===n?'active':''}" aria-label="Nodo ${n}${n==='A'?', inicio':n==='G'?', meta':''}"><circle cx="${x}" cy="${y}" r="25"/><text x="${x}" y="${y+7}">${n}</text></g><text class="caption" x="${x}" y="${y+48}">${n==='A'?'Inicio':n==='G'?'Meta':algorithm==='astar'?'h = '+hints[n]:''}</text>${algorithm==='astar'&&(n==='A'||n==='G')?`<text class="caption" x="${x}" y="${y+67}">h = ${hints[n]}</text>`:''}`;}).join('');
+ $('graph').innerHTML=`<svg class="graph" viewBox="0 0 660 425" role="img" aria-label="Grafo de ocho nodos. A es el inicio y G la meta. Conexiones activas: ${allEdges.filter((_,i)=>enabled[i]).map(e=>e.join(' con ')).join('; ')}"><title>Grafo de búsqueda de A a G</title>${edges}${nodes}</svg>`;
+}
+function render(){const s=frames[tick];draw(s);$('status').textContent=`Paso ${tick} de ${frames.length-1}. ${s.text}`;$('metrics').textContent=`Nodos revisados: ${s.reviewed.length} · Pendientes: ${s.frontier.length}`;
+ $('structure').textContent=algorithm==='bfs'?'Cola: el primero que entra es el primero que sale.':algorithm==='dfs'?'Pila: la última opción guardada sale primero. Se muestra primero el tope.':'Prioridad: menor f = g + h. Se muestra primero el menor.';
+ const ordered=algorithm==='dfs'?[...s.frontier].reverse():s.frontier;
+ $('pending').innerHTML=ordered.length?ordered.map((v,i)=>`<span class="token">${i===0?'Sigue: ':''}${v.node}</span>`).join(''):'Sin opciones pendientes.';
+ $('priority').innerHTML=algorithm==='astar'?'<table class="pending-table"><tr><th>Nodo</th><th>g</th><th>h</th><th>f</th></tr>'+ordered.map(v=>`<tr><td>${v.node}</td><td>${v.g}</td><td>${hints[v.node]}</td><td>${v.f}</td></tr>`).join('')+'</table>':'';
+ $('reviewed').textContent=s.reviewed.join(' → ')||'Ninguno todavía.';
+ $('parents').textContent=Object.entries(s.parent).map(([n,p])=>p===null?`${n}: inicio`:`${p} → ${n}`).join('\n');
+ $('back').disabled=tick===0;$('next').disabled=tick===frames.length-1;$('finish').disabled=tick===frames.length-1;
+}
+function rebuild(){frames=search();tick=0;render();generated='';$('code').textContent='Pulsa «Generar código» para crear el programa con las conexiones actuales.';$('codeStatus').textContent='';$('adjacency').textContent=JSON.stringify(graphData(),null,2);$('edges').innerHTML=allEdges.map(([a,b],i)=>`<button data-edge="${i}" aria-pressed="${enabled[i]}" aria-label="Conexión ${a} con ${b}: ${enabled[i]?'abierta':'cerrada'}">${a}—${b}</button>`).join('');}
+$('edges').addEventListener('click',e=>{const b=e.target.closest('button[data-edge]');if(!b)return;enabled[+b.dataset.edge]=!enabled[+b.dataset.edge];rebuild();});
+$('scenario').onchange=()=>{enabled=allEdges.map(([a,b])=>$('scenario').value==='trapped'?![a,b].includes('G'):$('scenario').value==='detour'?!(a==='C'&&b==='G'):true);rebuild();};
+$('next').onclick=()=>{tick=Math.min(tick+1,frames.length-1);render();};$('back').onclick=()=>{tick=Math.max(tick-1,0);render();};$('finish').onclick=()=>{tick=frames.length-1;render();};$('reset').onclick=()=>{tick=0;render();};
+function pythonCode(){
+ const data='grafo = '+JSON.stringify(graphData(),null,4)+'\n';
+ const common=`def reconstruir(anterior, nodo):
+    ruta = []
+    while nodo is not None:
+        ruta.append(nodo)
+        nodo = anterior[nodo]
+    return ruta[::-1]
+
+
+`;
+ let head='',code='';
+ if(algorithm==='astar'){
+ head='import heapq\n\n\n';
+ code=`# Pistas hacia G: no exageran lo que falta y son consistentes.
+# Si cambias la meta o añades conexiones nuevas, revisa estas pistas.
+# Con h = 0 en todos los nodos, A* también funciona, pero sin orientación.
+heuristica = ${JSON.stringify(hints)}
+
+
+def buscar(grafo, inicio, meta):
+    pendientes = [(heuristica[inicio], 0, inicio)]
+    mejor = {inicio: 0}
+    anterior = {inicio: None}
+    while pendientes:
+        f, g, actual = heapq.heappop(pendientes)
+        if g != mejor[actual]:
+            continue  # Ya encontramos una propuesta mejor para ese nodo.
+        if actual == meta:
+            return reconstruir(anterior, actual)
+        for vecino in sorted(grafo[actual]):
+            nuevo_g = g + 1
+            if nuevo_g < mejor.get(vecino, float("inf")):
+                mejor[vecino] = nuevo_g
+                anterior[vecino] = actual
+                nuevo_f = nuevo_g + heuristica[vecino]
+                heapq.heappush(pendientes, (nuevo_f, nuevo_g, vecino))
+    return None
+`;
+ }else{
+ const bfs=algorithm==='bfs';head=bfs?'from collections import deque\n\n\n':'';
+ code=`def buscar(grafo, inicio, meta):
+    pendientes = ${bfs?'deque([inicio])':'[inicio]'}
+    descubiertos = {inicio}
+    anterior = {inicio: None}
+    while pendientes:
+        actual = pendientes.${bfs?'popleft()':'pop()'}
+        if actual == meta:
+            return reconstruir(anterior, actual)
+        # ${bfs?'Vecinos en orden alfabético.':'Apilar al revés permite explorar primero la letra menor.'}
+        for vecino in sorted(grafo[actual]${bfs?'':', reverse=True'}):
+            if vecino not in descubiertos:
+                descubiertos.add(vecino)
+                anterior[vecino] = actual
+                pendientes.append(vecino)
+    return None
+`;
+ }
+ return `# ${algorithm.toUpperCase()} · Buscar de A a G en un grafo no dirigido.
+# Cada conexión cuesta 1. Los vecinos se consideran alfabéticamente.
+${head}${common}${code}\n\n${data}
+if __name__ == "__main__":
+    ruta = buscar(grafo, "A", "G")
+    if ruta is None:
+        print("No existe una ruta de A a G.")
+    else:
+        print("Ruta:", " -> ".join(ruta))
+        print("Conexiones:", len(ruta) - 1)
+`;
+}
+function generate(){generated=pythonCode();$('code').textContent=generated;$('codeStatus').textContent='Código actualizado con las conexiones actuales.';return generated;}
+function save(text,name){const url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+$('generate').onclick=generate;$('download').onclick=()=>save(generated||generate(),`${algorithm}_practica.py`);
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText(generated||generate());$('codeStatus').textContent='Código copiado.';}catch{$('codeStatus').textContent='Puedes seleccionar el código para copiarlo o descargar el archivo .py.';}};
+for(const id of ['answer1','answer2','answer3']){try{$(id).value=localStorage.getItem(`grafos-${algorithm}-${id}`)||'';}catch{}$(id).addEventListener('input',()=>{try{localStorage.setItem(`grafos-${algorithm}-${id}`,$(id).value);}catch{}});}
+$('notes').onclick=()=>save(`${algorithm.toUpperCase()} · Práctica con grafos\n\n`+['answer1','answer2','answer3'].map((id,i)=>`${i+1}. ${$(id).value}`).join('\n\n'),`${algorithm}_respuestas.txt`);
+rebuild();
+</script></body></html>
