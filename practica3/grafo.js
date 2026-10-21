@@ -1,9 +1,10 @@
 'use strict';
 const algorithm=document.body.dataset.algorithm, $=id=>document.getElementById(id);
-const positions={A:[70,205],B:[195,80],C:[195,330],D:[325,80],E:[455,80],F:[585,160],G:[585,330],H:[325,205]};
-const allEdges=[['A','B'],['A','C'],['B','D'],['B','H'],['D','H'],['D','E'],['E','F'],['F','G'],['C','G']];
-const hints={A:2,B:3,C:1,D:3,E:2,F:1,G:0,H:4};
-let enabled=allEdges.map(()=>true),frames=[],tick=0,generated='';
+const positions={A:[70,205],B:[195,80],C:[195,330],D:[325,80],E:[455,80],F:[585,160],G:[585,330],H:[585,245]};
+const allEdges=[['A','B'],['A','C'],['B','D'],['D','E'],['E','F'],['F','H'],['H','G'],['C','G']];
+const hints={A:2,B:3,C:1,D:4,E:3,F:2,G:0,H:1};
+let enabled=allEdges.map(()=>true),frames=[],tick=0,generated='',view='grid';
+const cells={A:[0,0],B:[0,1],D:[0,2],C:[1,0],E:[1,2],G:[2,0],H:[2,1],F:[2,2]};
 function graphData(){const g=Object.fromEntries(Object.keys(positions).map(n=>[n,[]]));allEdges.forEach(([a,b],i)=>{if(enabled[i]){g[a].push(b);g[b].push(a);}});for(const ns of Object.values(g))ns.sort();return g;}
 const cmp=(a,b)=>a.f-b.f||a.g-b.g||a.node.localeCompare(b.node);
 function search(){
@@ -27,11 +28,31 @@ function search(){
  }
  snap(null,[],'No existe una ruta hasta G: se agotaron las opciones pendientes.');return result;
 }
-function draw(s){
+function drawGraph(s){
  const edges=allEdges.map(([a,b],i)=>{const [x1,y1]=positions[a],[x2,y2]=positions[b];const route=s.path.some((n,j)=>j&&((s.path[j-1]===a&&n===b)||(s.path[j-1]===b&&n===a)));return `<line class="edge ${enabled[i]?'':'off'} ${route?'onroute':''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>${enabled[i]?`<text class="edge-cost" x="${(x1+x2)/2}" y="${(y1+y2)/2-10}">1</text>`:''}`;}).join('');
  const nodes=Object.entries(positions).map(([n,[x,y]])=>{const state=s.path.includes(n)?'route':s.reviewed.includes(n)?'seen':s.frontier.some(v=>v.node===n)?'pending':'';return `<g class="node ${state} ${s.actual===n?'active':''}" aria-label="Nodo ${n}${n==='A'?', inicio':n==='G'?', meta':''}"><circle cx="${x}" cy="${y}" r="25"/><text x="${x}" y="${y+7}">${n}</text></g><text class="caption" x="${x}" y="${y+48}">${n==='A'?'Inicio':n==='G'?'Meta':algorithm==='astar'?'h = '+hints[n]:''}</text>${algorithm==='astar'&&(n==='A'||n==='G')?`<text class="caption" x="${x}" y="${y+67}">h = ${hints[n]}</text>`:''}`;}).join('');
  $('graph').innerHTML=`<svg class="graph" viewBox="0 0 660 425" role="img" aria-label="Grafo de ocho nodos. A es el inicio y G la meta. Conexiones activas: ${allEdges.filter((_,i)=>enabled[i]).map(e=>e.join(' con ')).join('; ')}"><title>Grafo de búsqueda de A a G</title>${edges}${nodes}</svg>`;
 }
+function drawGrid(s){
+ const size=105,ox=42,oy=38;
+ let content='<rect x="42" y="38" width="315" height="315" rx="8" fill="#dce3df"/>';
+ for(let r=0;r<3;r++)for(let c=0;c<3;c++){
+  const name=Object.keys(cells).find(n=>cells[n][0]===r&&cells[n][1]===c),x=ox+c*size,y=oy+r*size;
+  if(!name){content+=`<rect x="${x+3}" y="${y+3}" width="99" height="99" fill="#203d43"/><text x="${x+52}" y="${y+57}" fill="white" text-anchor="middle" font-size="15">Pared</text>`;continue;}
+  const route=s.path.includes(name),seen=s.reviewed.includes(name),pending=s.frontier.some(n=>n.node===name);
+  const color=route?'#126b61':seen?'#dce8e0':pending?'#f4d899':'#fff';
+  content+=`<rect x="${x+3}" y="${y+3}" width="99" height="99" rx="5" fill="${color}" stroke="${s.actual===name?'#bd7932':'#c1d0c9'}" stroke-width="${s.actual===name?5:1}"/><text x="${x+52}" y="${y+49}" text-anchor="middle" font-size="26" fill="${route?'white':'#203d43'}">${name}</text><text x="${x+52}" y="${y+75}" text-anchor="middle" font-size="13" fill="${route?'white':'#203d43'}">${name==='A'?'Inicio':name==='G'?'Meta':algorithm==='astar'?'h = '+hints[name]:''}</text>`;
+ }
+ allEdges.forEach(([a,b],i)=>{
+  const [r,c]=cells[a],[r2,c2]=cells[b];const x1=ox+c*size+52,y1=oy+r*size+52,x2=ox+c2*size+52,y2=oy+r2*size+52;
+  if(!enabled[i]){const x=(x1+x2)/2,y=(y1+y2)/2;content+=`<line x1="${x-(r===r2?0:38)}" y1="${y-(r===r2?38:0)}" x2="${x+(r===r2?0:38)}" y2="${y+(r===r2?38:0)}" stroke="#203d43" stroke-width="9"/>`;}
+  else if(s.path.some((n,j)=>j&&((s.path[j-1]===a&&n===b)||(s.path[j-1]===b&&n===a))))content+=`<line x1="${x1+(x2-x1)*.3}" y1="${y1+(y2-y1)*.3}" x2="${x2-(x2-x1)*.3}" y2="${y2-(y2-y1)*.3}" stroke="#a8d7c3" stroke-width="5"/>`;
+ });
+ $('graph').innerHTML=`<svg viewBox="0 0 400 395" role="img" aria-label="Cuadrícula con ocho casillas libres y pared central. A es inicio y G es meta. Solo movimientos horizontales y verticales." style="width:100%;display:block"><title>El mismo problema visto como cuadrícula</title>${content}</svg>`;
+}
+function draw(s){if(view==='grid')drawGrid(s);else drawGraph(s);$('viewGrid').setAttribute('aria-pressed',String(view==='grid'));$('viewGraph').setAttribute('aria-pressed',String(view==='graph'));}
+$('viewGrid').onclick=()=>{view='grid';render();};
+$('viewGraph').onclick=()=>{view='graph';render();};
 function render(){const s=frames[tick];draw(s);$('status').textContent=`Paso ${tick} de ${frames.length-1}. ${s.text}`;$('metrics').textContent=`Nodos revisados: ${s.reviewed.length} · Pendientes: ${s.frontier.length}`;
  $('structure').textContent=algorithm==='bfs'?'Cola: el primero que entra es el primero que sale.':algorithm==='dfs'?'Pila: la última opción guardada sale primero. Se muestra primero el tope.':'Prioridad: menor f = g + h. Se muestra primero el menor.';
  const ordered=algorithm==='dfs'?[...s.frontier].reverse():s.frontier;

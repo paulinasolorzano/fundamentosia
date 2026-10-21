@@ -14,7 +14,7 @@ def reconstruir(anterior, nodo):
 # Pistas hacia G: no exageran lo que falta y son consistentes.
 # Si cambias la meta o añades conexiones nuevas, revisa estas pistas.
 # Con h = 0 en todos los nodos, A* también funciona, pero sin orientación.
-heuristica = {"A":2,"B":3,"C":1,"D":3,"E":2,"F":1,"G":0,"H":4}
+heuristica = {"A":2,"B":3,"C":1,"D":4,"E":3,"F":2,"G":0,"H":1}
 
 
 def buscar(grafo, inicio, meta):
@@ -44,8 +44,7 @@ grafo = {
     ],
     "B": [
         "A",
-        "D",
-        "H"
+        "D"
     ],
     "C": [
         "A",
@@ -53,8 +52,7 @@ grafo = {
     ],
     "D": [
         "B",
-        "E",
-        "H"
+        "E"
     ],
     "E": [
         "D",
@@ -62,15 +60,15 @@ grafo = {
     ],
     "F": [
         "E",
-        "G"
+        "H"
     ],
     "G": [
         "C",
-        "F"
+        "H"
     ],
     "H": [
-        "B",
-        "D"
+        "F",
+        "G"
     ]
 }
 
