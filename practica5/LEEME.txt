@@ -1,0 +1,26 @@
+PRÁCTICA: BÚSQUEDA LOCAL · FUNDAMENTOS DE IA
+
+1. Extrae la carpeta completa si recibiste un ZIP.
+2. Abre index.html en Chrome, Edge, Firefox o Safari.
+3. Recorre las siete pestañas. Los simuladores funcionan sin conexión.
+4. En Programar puedes descargar reparto.py con tus parámetros.
+5. Ejecuta Python en tu computadora, no dentro del navegador:
+   Windows: py reparto.py
+   macOS/Linux: python3 reparto.py
+6. En Tu actividad descarga tus respuestas. No se envían al docente.
+
+Contenido:
+- Introducción, vocabulario y objetivos.
+- Hill Climbing y Simulated Annealing paso a paso.
+- Paisaje de dos cimas y meseta con registro de decisiones.
+- Casos de horarios, reparto y almacén.
+- Comparación visual de rutas y código Python reproducible.
+- Tabla de DFS, BFS, A*, Hill Climbing y Simulated Annealing.
+- Preguntas, experimentos y guía de revisión.
+- Copias de las prácticas previas DFS, BFS y A* en anteriores/.
+
+La tabla comparativa se desplaza horizontalmente en pantallas pequeñas.
+El botón Imprimir práctica incluye todas las pestañas; puedes guardar un PDF.
+Las notas y orientaciones de respuesta son visibles para todo lector.
+Las distancias son rectas en unidades del mapa. No son rutas de calles.
+El historial agrega memoria para explicar los pasos: no es una exigencia de los algoritmos.
