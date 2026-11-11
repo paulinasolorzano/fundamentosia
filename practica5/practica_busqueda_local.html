@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Algoritmos de búsqueda: repaso y búsqueda local</title>
+<style>
+:root{--ink:#213b43;--green:#17675c;--light:#edf5ef;--line:#cfddd7;--orange:#91521a}*{box-sizing:border-box}body{margin:0;background:#f8f7f2;color:var(--ink);font:18px/1.65 system-ui,sans-serif}main{max-width:1050px;margin:auto;padding:28px 24px 70px}header{border-bottom:1px solid var(--line);padding-bottom:24px}h1{font-size:clamp(30px,5vw,48px);line-height:1.18;max-width:850px;margin:10px 0 18px}h2{font-size:29px;line-height:1.25}h3{font-size:22px}p{margin:12px 0}nav{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}button,select,textarea{font:inherit}button{border:1px solid var(--green);background:white;color:var(--green);padding:10px 15px;border-radius:9px;cursor:pointer}button:hover{background:var(--light)}button:disabled{opacity:.5;cursor:default}nav button[aria-selected=true],.primary{background:var(--green);color:white}.card,.notice{border:1px solid var(--line);border-radius:14px;padding:22px;margin:22px 0;background:white}.notice{background:var(--light);border-left:5px solid var(--green)}.warning{background:#fff4e5;border-color:#dfba8d}.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.grid .card{margin:0}li{margin:10px 0}strong{font-weight:700}.controls{display:flex;align-items:end;gap:16px;flex-wrap:wrap;margin:18px 0}label{display:block}select{display:block;padding:8px;margin-top:5px;border:1px solid var(--line);border-radius:6px;background:white}table{border-collapse:collapse;width:100%;font-size:16px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--light)}.scroll{overflow:auto}caption{text-align:left;font-weight:700;margin:12px 0}.actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.small{font-size:15px}svg{width:100%;max-height:340px}svg text{font:15px system-ui;fill:var(--ink)}textarea{width:100%;min-height:95px;padding:12px;border:1px solid var(--line);border-radius:8px;margin:8px 0 18px}details{padding:16px;background:white;border:1px solid var(--line);border-radius:10px;margin:20px 0}summary{cursor:pointer;font-weight:700}.formula{font-size:21px;text-align:center}footer{font-size:14px;border-top:1px solid var(--line);padding-top:15px;margin-top:30px}[hidden]{display:none!important}@media(max-width:680px){main{padding:18px 15px}.grid{grid-template-columns:1fr}nav button{flex:1 1 140px;font-size:16px}.card,.notice{padding:16px}h2{font-size:25px}}@media print{nav,.actions,button{display:none!important}section[hidden]{display:block!important}section{break-before:page}textarea{min-height:100px}header{break-after:avoid}}
+</style></head><body><main>
+<header><p>Fundamentos de Inteligencia Artificial</p><h1>De buscar un camino a mejorar una solución</h1><p>Ya conoces BFS, DFS y los algoritmos genéticos: todos exploran opciones para resolver un problema. Primero los recordaremos. Después conocerás dos métodos que intentan mejorar una solución que ya tienes: <strong>Hill Climbing</strong> y <strong>recocido simulado</strong>.</p><p><strong>Empieza en «1. Recordar lo aprendido».</strong> Sigue las pestañas en orden y termina con la actividad.</p></header>
+<nav role="tablist" aria-label="Pasos de la práctica"><button role="tab" id="tab-repaso" aria-controls="repaso" aria-selected="true" data-tab="repaso">1. Recordar lo aprendido</button><button role="tab" id="tab-cambio" aria-controls="cambio" aria-selected="false" tabindex="-1" data-tab="cambio">2. ¿Qué cambia ahora?</button><button role="tab" id="tab-hill" aria-controls="hill" aria-selected="false" tabindex="-1" data-tab="hill">3. Hill Climbing</button><button role="tab" id="tab-sa" aria-controls="sa" aria-selected="false" tabindex="-1" data-tab="sa">4. Recocido simulado</button><button role="tab" id="tab-actividad" aria-controls="actividad" aria-selected="false" tabindex="-1" data-tab="actividad">5. Tu actividad</button></nav>
+<section id="repaso" role="tabpanel" aria-labelledby="tab-repaso">
+<h2>Primero recordemos: ¿cómo encontramos un camino?</h2><p>Estás en la entrada de una escuela y quieres llegar a la salida. En el dibujo, <strong>cada círculo es un lugar</strong> y <strong>cada línea es un paso permitido</strong>. Puedes recorrer las líneas en ambos sentidos. Cada paso cuenta igual.</p>
+<div class="grid"><article class="card"><h3>BFS: búsqueda en anchura</h3><p>Revisa primero los lugares que están a un paso. Después los que están a dos, y así sucesivamente.</p><p><strong>Idea:</strong> explorar por niveles.</p><p>En este ejemplo encuentra un camino con el menor número de pasos.</p></article><article class="card"><h3>DFS: búsqueda en profundidad</h3><p>Sigue una rama mientras pueda avanzar. Si esa rama no llega a la meta, retrocede y prueba otra.</p><p><strong>Idea:</strong> profundizar y después retroceder.</p><p>Puede encontrar un camino sin que sea el más corto.</p></article></div>
+<div class="card"><h3>Observa la diferencia en el mismo mapa</h3><p>Cuando hay varias opciones sin visitar, revisaremos primero la rama del Patio. Dejaremos de buscar al revisar la Salida. Marcamos los lugares visitados para no repetirlos.</p><div class="controls"><label>Elige el recorrido<select id="walk-method"><option value="bfs">BFS · por niveles</option><option value="dfs">DFS · por una rama</option></select></label><button id="walk-next" class="primary">Revisar siguiente lugar</button><button id="walk-reset">Volver al inicio</button></div><div id="map"></div><p><strong>Verde:</strong> lugar que se está revisando. <strong>Círculos con borde grueso:</strong> lugares ya revisados.</p><p id="walk-status" aria-live="polite"></p><p id="walk-order"></p><p id="walk-path"></p><p><strong>Hazlo tú:</strong> termina el recorrido con BFS. Anota el camino encontrado y cuántas líneas recorre. Después elige DFS y repite. ¿Llegaron por el mismo camino?</p></div>
+<article class="card"><h3>También recordemos los algoritmos genéticos</h3><p><strong>Sí, también son métodos de búsqueda y optimización.</strong> Trabajan con varias soluciones al mismo tiempo, llamadas <strong>población</strong>. Por ejemplo, varios horarios completos.</p><ol><li><strong>Evaluar:</strong> medir qué tan conveniente es cada solución.</li><li><strong>Seleccionar:</strong> elegir soluciones para producir nuevas propuestas; las mejores suelen tener más posibilidad de participar.</li><li><strong>Cruzar:</strong> combinar partes de dos soluciones para crear otras.</li><li><strong>Mutar:</strong> cambiar algún valor de una solución.</li><li><strong>Formar otra población</strong> y repetir el proceso durante varias generaciones.</li></ol><p><strong>Ejemplo:</strong> cada valor de un cromosoma puede representar la hora de una clase. El cromosoma completo representa un horario. Una mutación puede cambiar la hora de Matemáticas. Una cruza puede combinar asignaciones de clases de dos horarios.</p><p>Las propuestas nuevas pueden generar empalmes. El programa debe comprobar las restricciones: en el enfoque de esta práctica, una propuesta inválida se descarta y se genera otra. La cruza y la mutación no garantizan horarios válidos ni mejores.</p><div class="notice"><strong>La idea que debes recordar:</strong> un algoritmo genético busca mediante una población que cambia entre generaciones. HC y recocido simulado, que veremos enseguida, trabajan sobre una solución actual y prueban cambios en ella.</div></article><div class="notice"><strong>Repaso:</strong> BFS explora por niveles; DFS sigue una rama; un algoritmo genético genera nuevas propuestas a partir de una población. Todos son métodos de búsqueda, pero no exploran del mismo modo.</div><button class="primary" data-go="cambio">Continuar: ¿qué cambia ahora? →</button>
+</section>
+<section id="cambio" role="tabpanel" aria-labelledby="tab-cambio" hidden>
+<h2>Ahora ya tenemos una solución. Queremos mejorarla.</h2><p>Piensa en un horario de clases. Ya está organizado y no tiene empalmes, pero deja dos horas libres entre clases. La pregunta ahora es:</p><div class="notice"><strong>«¿Puedo mover una clase para dejar menos horas libres?»</strong></div>
+<div class="scroll"><table><caption>La relación con BFS y DFS</caption><thead><tr><th>Pregunta</th><th>Antes: el mapa</th><th>Ahora: el horario</th></tr></thead><tbody><tr><th>¿Qué es una opción o estado?</th><td>El lugar donde estamos.</td><td>Un horario completo.</td></tr><tr><th>¿Qué significa dar un paso?</th><td>Recorrer una línea hacia otro lugar.</td><td>Cambiar una clase de hora.</td></tr><tr><th>¿Qué queremos?</th><td>Encontrar un camino hasta la salida.</td><td>Encontrar un horario válido con menos horas libres.</td></tr><tr><th>¿Cómo exploramos?</th><td>BFS por niveles; DFS por una rama.</td><td>HC prueba cambios y conserva una mejora. SA también permite algunos cambios que empeoran.</td></tr></tbody></table></div>
+<p>BFS, DFS, los algoritmos genéticos, Hill Climbing y recocido simulado son <strong>métodos de búsqueda</strong>: procedimientos para explorar opciones. Hill Climbing y recocido simulado pertenecen a la <strong>búsqueda local</strong>: parten de una solución y prueban cambios cercanos. A una solución obtenida con uno de esos cambios la llamaremos <strong>vecina</strong>.</p><p>En el horario, «vecina» no significa un salón cercano: significa otro horario obtenido al mover una clase.</p>
+<details><summary>¿BFS y DFS también podrían explorar horarios?</summary><p>Sí, si cada nodo representa un horario y cada conexión un cambio permitido. Pero encontrar un horario en pocos cambios no significa encontrar el que tenga menos horas libres. La representación y lo que queremos conseguir deben estar claros.</p></details>
+<h3>¿Qué relación tienen los cinco?</h3><p>Todos exploran posibilidades. Se diferencian en cómo representan las opciones y cómo deciden cuáles revisar o conservar.</p><div class="scroll"><table><thead><tr><th>Método</th><th>Idea sencilla</th><th>En los ejemplos de esta práctica</th></tr></thead><tbody><tr><th>BFS</th><td>Revisar por niveles.</td><td>Encontrar un camino con menos pasos cuando cada paso cuenta igual.</td></tr><tr><th>DFS</th><td>Seguir una rama y retroceder si hace falta.</td><td>Encontrar un camino a la salida, aunque no sea el más corto.</td></tr><tr><th>Algoritmo genético</th><td>Producir nuevas soluciones a partir de una población, con selección, cruza y mutación.</td><td>Explorar varios horarios completos entre generaciones.</td></tr><tr><th>Hill Climbing · HC</th><td>Revisar los vecinos válidos y conservar el que más mejora la solución actual.</td><td>Reducir las horas libres sin permitir un aumento.</td></tr><tr><th>Recocido simulado · SA</th><td>Proponer un vecino y permitir algunos empeoramientos según una probabilidad.</td><td>Poder aceptar temporalmente más horas libres, respetando las reglas.</td></tr></tbody></table></div><p><strong>No se trata de que uno sustituya siempre a los demás.</strong> Elegimos la estrategia según el problema. En el mapa buscamos un camino; en los horarios comparamos la calidad de soluciones completas. Los genéticos son búsqueda evolutiva basada en poblaciones; HC y SA son los métodos de búsqueda local que practicaremos aquí.</p><h3>Primero las reglas; después la mejora</h3><p>Una <strong>restricción obligatoria</strong> es una regla que no podemos incumplir. En esta práctica:</p><ul><li>El grupo no puede tener dos clases a la misma hora.</li><li>El profesor debe estar disponible.</li><li>El salón debe estar libre.</li></ul><p>En cambio, <strong>tener menos horas libres es lo que queremos mejorar</strong>. Un horario con tres horas libres puede ser válido, aunque nos guste menos que uno con dos.</p>
+<ol><li><strong>Proponemos</strong> mover una clase. Todavía no cambiamos el horario actual.</li><li><strong>Comprobamos las reglas.</strong> Si alguna se incumple, descartamos la propuesta.</li><li><strong>Si la propuesta es válida, contamos sus horas libres.</strong></li><li><strong>El algoritmo decide</strong> si la acepta.</li></ol><div class="notice"><strong>Primero: «¿se puede hacer?». Después: «¿nos conviene?».</strong> Estas comprobaciones se programan; el algoritmo no conoce por sí solo la disponibilidad del profesor o del salón.</div>
+<button class="primary" data-go="hill">Continuar: Hill Climbing →</button>
+</section>
+<section id="hill" role="tabpanel" aria-labelledby="tab-hill" hidden>
+<h2>Hill Climbing: conservar un cambio que mejora</h2><p><strong>Hill Climbing</strong> se traduce como <strong>ascenso de colina</strong>. La idea es avanzar hacia una solución mejor mediante pequeños cambios. En nuestro horario, mejor significa <strong>menos horas libres</strong>.</p><div class="notice"><strong>Su regla en esta práctica:</strong> «Reviso los cambios válidos, elijo el que deja menos horas libres y lo acepto si mejora mi horario actual».</div>
+<h3>Ejemplo: mover Matemáticas</h3><div class="scroll"><table><caption>Horario original del grupo</caption><thead><tr><th>8–9</th><th>9–10</th><th>10–11</th><th>11–12</th><th>12–13</th></tr></thead><tbody><tr><td>Programación</td><td>Inglés</td><td>Libre</td><td>Libre</td><td>Matemáticas</td></tr></tbody></table></div><p>Hay <strong>dos horas libres</strong>: de 10:00 a 12:00. Solo moveremos Matemáticas, que dura una hora. Programación e Inglés permanecen fijas.</p>
+<p>Estos son todos los cambios que permitiremos en el ejemplo:</p><div class="scroll"><table><thead><tr><th>Mover Matemáticas a…</th><th>¿Cumple las reglas?</th><th>¿Qué hacemos?</th></tr></thead><tbody><tr><td>9:00–10:00</td><td>No. El grupo tiene Inglés.</td><td>Descartamos. No evaluamos si conviene.</td></tr><tr><td>10:00–11:00</td><td>Sí. Grupo, profesor y salón disponibles.</td><td>Contamos: cero horas libres entre clases.</td></tr><tr><td>11:00–12:00</td><td>No. El salón está ocupado por otro grupo.</td><td>Descartamos. No evaluamos si conviene.</td></tr><tr><td>13:00–14:00</td><td>Sí. Grupo, profesor y salón disponibles.</td><td>Contamos: tres horas libres entre clases.</td></tr></tbody></table></div>
+<p><strong>HC elige las 10:00.</strong> Es el cambio válido con menos horas libres: pasa de dos a cero. A las 13:00 aumentaría a tres, así que no lo elige.</p><div class="scroll"><table><caption>Horario después del cambio elegido</caption><thead><tr><th>8–9</th><th>9–10</th><th>10–11</th></tr></thead><tbody><tr><td>Programación</td><td>Inglés</td><td>Matemáticas</td></tr></tbody></table></div>
+<h3>¿Cómo funciona, paso a paso?</h3><ol><li>Comienza con una solución válida.</li><li>Genera los cambios permitidos y descarta los que incumplan reglas.</li><li>Compara las soluciones vecinas válidas.</li><li>Si alguna mejora la actual, elige la mejor y repite desde ella.</li><li>Si ninguna mejora la actual, se detiene.</li></ol>
+<p>En este ejemplo llegamos a cero horas libres y no podemos reducirlas más. En problemas más grandes, HC puede detenerse aunque exista una solución mejor: quizá para alcanzarla habría que aceptar primero un cambio que empeore.</p><p>A esa situación la llamamos <strong>óptimo local</strong>: ningún cambio cercano permitido mejora la solución actual. Eso no significa necesariamente que sea la mejor de todas.</p>
+<button class="primary" data-go="sa">Continuar: ¿y si un cambio empeora? →</button>
+</section>
+<section id="sa" role="tabpanel" aria-labelledby="tab-sa" hidden>
+<h2>Recocido simulado: a veces aceptar un cambio que empeora</h2><p><strong>Simulated Annealing</strong> se traduce como <strong>recocido simulado</strong>. También prueba cambios en una solución, pero puede aceptar algunos que la empeoran para seguir explorando otras opciones.</p><div class="notice"><strong>Su regla:</strong> «Acepto los cambios válidos que mejoran. A veces acepto uno que empeora. Al avanzar, me vuelvo más exigente».</div>
+<p>Vuelve al horario original, con dos horas libres. Supón que SA propone mover Matemáticas a las 13:00. El cambio cumple las reglas, pero deja tres horas libres.</p><p><strong>HC rechazaría ese cambio. SA podría aceptarlo.</strong> Desde el nuevo horario podría probar otras reorganizaciones. Eso no asegura que encuentre algo mejor después.</p><p>Si propone las 9:00, ambos lo descartan por el empalme con Inglés. <strong>Aceptar un horario peor no significa aceptar un horario inválido.</strong></p>
+<h3>¿Cuándo acepta un cambio que empeora?</h3><p>El programa calcula una probabilidad y realiza un sorteo. La <strong>temperatura</strong> es un número que controla esa probabilidad. Al principio es más alta y facilita aceptar cambios desfavorables; después disminuye y estos cambios son menos probables.</p><p>Conserva por separado <strong>el horario actual</strong> y <strong>el mejor horario encontrado</strong>. Al terminar, devuelve el mejor registrado.</p>
+<div class="card"><h3>Prueba tú: primero las reglas, después la decisión</h3><p>Elige una de las cuatro propuestas del ejemplo. Selecciona el algoritmo y pulsa el botón. Cada prueba empieza otra vez con el horario original de dos horas libres.</p><div class="controls"><label>Inicio de Matemáticas<select id="hour"><option value="9">9:00</option><option value="10">10:00</option><option value="11">11:00</option><option value="13">13:00</option></select></label><label>Algoritmo<select id="method"><option value="hc">Hill Climbing</option><option value="sa">Recocido simulado</option></select></label><button id="check" class="primary">Comprobar propuesta</button></div><div id="result" aria-live="polite"><p>Selecciona una hora y pulsa «Comprobar propuesta».</p></div></div>
+<details><summary>Después de entender la idea: la fórmula explicada desde cero</summary><h3>1. ¿Qué números vienen del horario?</h3><p>El horario actual tiene 2 horas libres y el propuesto tiene 3. El cambio es 3 − 2 = 1 hora adicional. Como queremos menos horas libres, este cambio empeora el horario.</p><p>Al cambio lo representamos con <strong>Δ, que se llama delta mayúscula</strong>. Es una letra griega, no un triángulo geométrico. Aquí Δ = horas libres propuestas − horas libres actuales.</p><h3>2. ¿De dónde sale 2.71828?</h3><p>Es el valor aproximado de <strong>e</strong>, una constante matemática, así como π (pi) vale aproximadamente 3.1416. No sale del horario ni lo elige el usuario.</p><p>La fórmula de recocido simulado utiliza esta constante para que un empeoramiento pequeño tenga más posibilidad de aceptarse que uno grande. Al bajar la temperatura también disminuye la posibilidad de aceptar el mismo empeoramiento.</p><h3>3. ¿Qué significa exp?</h3><p><strong>exp(z) significa e elevado al exponente z.</strong> Es otra manera de escribir una potencia. Por ejemplo, exp(2) = e × e ≈ 7.389. La letra z representa el exponente que pongamos dentro del paréntesis; no es otro dato que debamos buscar.</p><h3>4. ¿Qué es la temperatura?</h3><p><strong>T</strong> es un número positivo que controla la probabilidad. Para este ejemplo elegimos T = 4. No son grados físicos y no se obtiene del horario.</p><h3>5. Sustituye los valores</h3><p>Solo para un aumento de horas libres, calculamos la probabilidad <strong>p</strong> con esta fórmula:</p><p class="formula">p = exp(−Δ / T)</p><ol><li>Delta vale 1 y T vale 4.</li><li>El exponente es −1 / 4 = −0.25.</li><li>Calculamos e elevado a −0.25: aproximadamente 0.779.</li><li>0.779 equivale a un <strong>77.9 % de posibilidad de aceptar este empeoramiento</strong>. No es la probabilidad de encontrar el mejor horario.</li></ol><p>No necesitas calcular esa potencia a mano. En Python, <code>exp(-1 / 4)</code> obtiene el resultado.</p><div class="scroll"><table><caption>De dónde sale cada número</caption><thead><tr><th>Número</th><th>Origen</th></tr></thead><tbody><tr><td>2.71828…</td><td>Constante e: no cambia con los datos.</td></tr><tr><td>1</td><td>Del horario: 3 − 2 horas libres.</td></tr><tr><td>4</td><td>Temperatura elegida para el ejemplo.</td></tr><tr><td>−0.25</td><td>Resultado de −1 / 4.</td></tr><tr><td>0.779</td><td>Resultado de e elevado a −0.25.</td></tr></tbody></table></div><h3>6. Realiza el sorteo y decide</h3><p>El programa genera un número <strong>u</strong> entre 0 incluido y 1 excluido. Si u es menor que p, acepta; si es igual o mayor, rechaza.</p><ul><li>Con u = 0.30: acepta, porque 0.30 &lt; 0.779.</li><li>Con u = 0.90: rechaza, porque 0.90 &gt; 0.779.</li></ul><p>En el ejemplo web usamos el valor fijo 0.30 para que puedas comprobar la comparación. El código descargable genera sorteos con una semilla: un valor que permite repetir la misma secuencia.</p><h3>7. Baja la temperatura</h3><p>El programa multiplica T por un factor menor que 1. En el código, ese factor vale 0.85: después del primer intento, T pasa de 4 a 4 × 0.85 = 3.4.</p><p>Con una temperatura mucho menor, T = 0.5, aceptar el mismo aumento tiene p ≈ 0.135. Con u = 0.30 ahora se rechazaría.</p><p>Si la propuesta reduce o mantiene las horas libres, esta variante de SA la acepta directamente. Si incumple una restricción obligatoria, se descarta antes de usar la fórmula. Aquí minimizamos horas libres; la fórmula se adapta si el objetivo es maximizar una puntuación.</p></details>
+<button class="primary" data-go="actividad">Continuar: realizar la actividad →</button>
+</section>
+<section id="actividad" role="tabpanel" aria-labelledby="tab-actividad" hidden>
+<h2>Comprueba lo que entendiste</h2><p>Realiza estas cinco acciones y después ejecuta el ejemplo en Python. Escribe tus respuestas aquí y al terminar pulsa «Descargar mis respuestas». También puedes resolverlas en tu cuaderno.</p><label>Nombre y grupo<input id="student" style="display:block;font:inherit;max-width:100%;padding:8px;border:1px solid #cfddd7" placeholder="Escribe tu nombre y grupo"></label>
+<h3>1. Recuerda BFS y DFS</h3><p>Abre la primera pestaña. Termina los dos recorridos y anota el camino encontrado por cada uno, cuántos pasos tiene y cuál explora por niveles.</p><label for="a1">Tu respuesta</label><textarea id="a1"></textarea>
+<h3>2. Comprueba las restricciones</h3><p>En la cuarta pestaña, prueba Matemáticas a las 9:00 y a las 11:00. ¿Por qué se descarta cada propuesta? ¿En qué momento se revisan esas reglas?</p><label for="a2">Tu respuesta</label><textarea id="a2"></textarea>
+<h3>3. Compara las decisiones</h3><p>Prueba las 10:00 y las 13:00 con los dos algoritmos. Completa los cuatro resultados: horas libres y decisión. Explica por qué HC elige las 10:00 y por qué SA puede aceptar las 13:00.</p><label for="a3">Tu respuesta</label><textarea id="a3" placeholder="10:00 · HC: … / SA: …&#10;13:00 · HC: … / SA: …"></textarea>
+<h3>4. Conecta los algoritmos</h3><p>Completa con tus palabras: «En el mapa, un estado es… En el horario, un estado es… BFS y DFS buscan… Un algoritmo genético trabaja con… Hill Climbing y recocido simulado intentan…».</p><label for="a4">Tu respuesta</label><textarea id="a4"></textarea>
+<h3>5. Relaciona con el algoritmo genético</h3><p>Imagina tres horarios válidos: A tiene 0 horas libres, B tiene 2 y C tiene 3. Responde:</p><ol><li>¿Qué representa la población: uno de esos horarios o el conjunto de los tres?</li><li>¿Qué horario tiene la mejor evaluación si queremos menos horas libres?</li><li>Una mutación mueve una clase y genera un empalme. Según el enfoque de esta práctica, ¿cuándo se revisa la restricción y qué se hace con esa propuesta?</li><li>¿Qué diferencia hay entre explorar una población y modificar una solución actual?</li></ol><label for="a6">Tu respuesta</label><textarea id="a6"></textarea><article class="card"><h3>Ejecuta el mismo ejemplo en Python</h3><p>Descarga el programa comentado. Incluye las restricciones del horario, Hill Climbing y recocido simulado. Solo necesitas Python 3; no requiere instalar paquetes.</p><ol><li>Pulsa «Descargar código Python». El archivo se llama <code>horarios_busqueda.py</code>.</li><li>Guárdalo en una carpeta y abre una terminal en esa carpeta.</li><li>En Windows escribe <code>py horarios_busqueda.py</code>. En Mac o Linux escribe <code>python3 horarios_busqueda.py</code>.</li><li>Lee los mensajes: primero se comprueban las restricciones, después se cuentan las horas libres y finalmente se decide si se acepta la propuesta.</li></ol><button class="primary" id="download-python">Descargar código Python</button><p id="python-status" role="status"></p><p>En el programa, SA propone horarios y sortea números con una semilla que permite repetir la ejecución. Los pasos pueden diferir del ejemplo web, que usa una propuesta elegida por ti y el sorteo fijo 0.30.</p><p>En este horario pequeño se puede llegar a cero horas libres con un solo cambio. Sirve para entender las decisiones y las restricciones; no demuestra cómo escapar de un óptimo local.</p><details><summary>Ver el código comentado</summary><pre style="overflow:auto;font-size:14px;line-height:1.6"><code id="python-source">&quot;&quot;&quot;Búsqueda local: mover Matemáticas para reducir horas libres.
+Ejecuta: python3 horarios_busqueda.py (Mac/Linux)
+         py horarios_busqueda.py (Windows)
+Solo utiliza módulos incluidos con Python 3.
+&quot;&quot;&quot;
+from math import exp, e
+from random import Random
+
+# Las clases duran una hora. Programación empieza a las 8 e Inglés a las 9.
+CLASES_FIJAS = [8, 9]
+HORAS_PERMITIDAS = [9, 10, 11, 12, 13]
+HORA_INICIAL = 12  # Matemáticas empieza a las 12:00.
+TEMPERATURA_INICIAL = 4.0
+ENFRIAMIENTO = 0.85  # Multiplicamos T por este factor tras cada intento.
+SEMILLA = 42  # Reproduce la misma secuencia de propuestas y sorteos.
+INTENTOS = 12
+
+
+def restricciones(hora):
+    &quot;&quot;&quot;Devuelve las reglas incumplidas. Lista vacía significa horario válido.&quot;&quot;&quot;
+    errores = []
+    if hora not in HORAS_PERMITIDAS:
+        errores.append(&quot;El profesor no está disponible a esa hora.&quot;)
+    if hora in CLASES_FIJAS:
+        errores.append(&quot;El grupo ya tiene una clase a esa hora.&quot;)
+    if hora == 11:
+        errores.append(&quot;El salón está ocupado por otro grupo a las 11:00.&quot;)
+    return errores
+
+
+def horas_libres(hora):
+    &quot;&quot;&quot;Cuenta horas vacías entre la primera y la última clase del grupo.&quot;&quot;&quot;
+    # Nunca evaluamos como aceptable un horario que incumpla las reglas.
+    if restricciones(hora):
+        raise ValueError(&quot;No calcules la calidad de un horario inválido.&quot;)
+    inicios = CLASES_FIJAS + [hora]
+    duracion_del_dia = max(inicios) + 1 - min(inicios)
+    return duracion_del_dia - len(inicios)
+
+
+def vecinos(actual):
+    &quot;&quot;&quot;Cada vecino cambia la hora de Matemáticas y conserva las otras clases.&quot;&quot;&quot;
+    return [hora for hora in HORAS_PERMITIDAS if hora != actual]
+
+
+def hill_climbing(inicial):
+    &quot;&quot;&quot;Revisa todos los vecinos válidos; acepta solo el de menor costo si mejora.&quot;&quot;&quot;
+    if restricciones(inicial):
+        raise ValueError(&quot;El horario inicial debe ser válido.&quot;)
+    actual = inicial
+    print(&quot;\nHILL CLIMBING&quot;)
+    while True:
+        validos = []
+        for propuesta in vecinos(actual):
+            errores = restricciones(propuesta)  # 1. Comprobar reglas primero.
+            if errores:
+                print(f&quot;  {propuesta}:00 descartado: {&#x27; &#x27;.join(errores)}&quot;)
+                continue  # No calculamos el costo de esta propuesta.
+            costo = horas_libres(propuesta)  # 2. Evaluar solo si es válido.
+            print(f&quot;  {propuesta}:00 válido: {costo} horas libres.&quot;)
+            validos.append(propuesta)
+        if not validos:
+            break
+        mejor_vecino = min(validos, key=horas_libres)
+        # 3. Decidir: solo aceptamos una reducción estricta de horas libres.
+        if horas_libres(mejor_vecino) &gt;= horas_libres(actual):
+            print(&quot;  Ningún vecino válido reduce las horas libres. Fin.&quot;)
+            break
+        actual = mejor_vecino
+        print(f&quot;  Acepta {actual}:00: {horas_libres(actual)} horas libres.&quot;)
+    return actual
+
+
+def recocido_simulado(inicial, semilla=SEMILLA):
+    &quot;&quot;&quot;Propone un vecino al azar y puede aceptar aumentos de horas libres.&quot;&quot;&quot;
+    if restricciones(inicial):
+        raise ValueError(&quot;El horario inicial debe ser válido.&quot;)
+    azar = Random(semilla)
+    actual = mejor = inicial
+    temperatura = TEMPERATURA_INICIAL
+    print(&quot;\nRECOCIDO SIMULADO&quot;)
+    for intento in range(1, INTENTOS + 1):
+        propuesta = azar.choice(vecinos(actual))
+        errores = restricciones(propuesta)  # 1. Comprobar reglas primero.
+        print(f&quot;  Intento {intento}, T={temperatura:.3f}: propone {propuesta}:00.&quot;)
+        if errores:
+            print(&quot;    Descarta: &quot; + &quot; &quot;.join(errores))
+        else:
+            # 2. Evaluar: menos horas libres es mejor.
+            delta = horas_libres(propuesta) - horas_libres(actual)
+            if delta &lt;= 0:
+                acepta = True
+                print(f&quot;    Cambio de horas libres = {delta}. Acepta: mejora o empata.&quot;)
+            else:
+                # exp(z) es e elevado a z. e es una constante, no un dato.
+                probabilidad = exp(-delta / temperatura)
+                sorteo = azar.random()  # Número entre 0 incluido y 1 excluido.
+                acepta = sorteo &lt; probabilidad  # 3. Decidir sobre el cambio válido.
+                print(f&quot;    Empeora en {delta} horas libres.&quot;)
+                print(f&quot;    p=exp(-{delta}/{temperatura:.3f})={probabilidad:.3f}; &quot;
+                      f&quot;u={sorteo:.3f}: {&#x27;acepta&#x27; if acepta else &#x27;rechaza&#x27;}.&quot;)
+            if acepta:
+                actual = propuesta
+            if horas_libres(actual) &lt; horas_libres(mejor):
+                mejor = actual  # Conserva el mejor hallazgo, aunque luego empeore.
+            print(f&quot;    Actual: {actual}:00; mejor registrado: {mejor}:00.&quot;)
+        temperatura *= ENFRIAMIENTO
+    return mejor
+
+
+def main():
+    print(&quot;HORARIO ORIGINAL: Programación 8:00, Inglés 9:00, Matemáticas 12:00.&quot;)
+    print(&quot;Tiene&quot;, horas_libres(HORA_INICIAL), &quot;horas libres entre clases.&quot;)
+    print(&quot;\nDE DÓNDE SALE CADA NÚMERO&quot;)
+    print(f&quot;e = {e:.5f}: constante matemática, como pi; no sale del horario.&quot;)
+    print(&quot;Delta = 3 - 2 = 1: aumento de horas libres.&quot;)
+    print(&quot;T = 4: temperatura elegida para este ejemplo.&quot;)
+    print(f&quot;p = exp(-1/4) = {exp(-1/4):.3f}: resultado, aproximadamente 77.9 %.&quot;)
+    hc = hill_climbing(HORA_INICIAL)
+    sa = recocido_simulado(HORA_INICIAL)
+    print(&quot;\nRESULTADOS&quot;)
+    print(f&quot;HC: Matemáticas a las {hc}:00, {horas_libres(hc)} horas libres.&quot;)
+    print(f&quot;SA: Matemáticas a las {sa}:00, {horas_libres(sa)} horas libres.&quot;)
+    print(&quot;Los sorteos de Python son distintos del u=0.30 fijo del ejemplo web.&quot;)
+    print(&quot;Este ejemplo pequeño no demuestra escapar de un óptimo local.&quot;)
+    print(&quot;Una ejecución finita de estos métodos no garantiza el óptimo general.&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+    main()
+</code></pre></details><h3>Prueba un cambio y explica el resultado</h3><p>Ejecuta el programa original. Después cambia <code>SEMILLA = 42</code> por <code>SEMILLA = 7</code> y vuelve a ejecutarlo. ¿Cambian las propuestas de SA? ¿Cambia HC? Anota tus observaciones; no es obligatorio que el resultado final sea diferente.</p><label for="a5">Tu observación del código</label><textarea id="a5"></textarea></article><div class="notice"><strong>Para recordar:</strong> BFS explora por niveles. DFS sigue una rama. Un algoritmo genético explora con una población. Hill Climbing conserva mejoras. Recocido simulado también puede aceptar algunos empeoramientos. En nuestro ejemplo de horarios, ambos comprueban primero las reglas obligatorias.</div><p>Los algoritmos genéticos y los dos métodos locales pueden ser útiles, pero no garantizan encontrar la mejor solución posible en una ejecución finita.</p><div class="actions"><button class="primary" id="download">Descargar mis respuestas</button><button id="print">Imprimir práctica</button></div><p id="save" role="status">Las respuestas no se envían automáticamente. Descarga el archivo para entregarlo.</p>
+</section><footer>Fundamentos de Inteligencia Artificial · Búsqueda de caminos y búsqueda local.</footer></main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+function show(id,focus=false){if(!$(id)||!$('tab-'+id))id='repaso';document.querySelectorAll('[role=tabpanel]').forEach(s=>s.hidden=s.id!==id);document.querySelectorAll('[data-tab]').forEach(b=>{let on=b.dataset.tab===id;b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;});if(focus)$('tab-'+id).focus();}
+document.querySelectorAll('[data-tab]').forEach(b=>{b.onclick=()=>show(b.dataset.tab);b.onkeydown=e=>{let tabs=[...document.querySelectorAll('[data-tab]')],i=tabs.indexOf(b),n;if(e.key==='ArrowRight')n=(i+1)%tabs.length;if(e.key==='ArrowLeft')n=(i+tabs.length-1)%tabs.length;if(e.key==='Home')n=0;if(e.key==='End')n=tabs.length-1;if(n!==undefined){e.preventDefault();show(tabs[n].dataset.tab,true);}};});document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{show(b.dataset.go,true);document.querySelector('nav').scrollIntoView({block:'start'});});
+const nodes={A:[65,150,'Entrada'],B:[220,50,'Patio'],C:[220,250,'Pasillo'],D:[390,50,'Laboratorio'],E:[560,50,'Biblioteca'],G:[560,250,'Salida']},edges=[['A','B'],['A','C'],['B','D'],['D','E'],['E','G'],['C','G']];
+const runs={bfs:{order:['A','B','C','D','G'],path:['A','C','G']},dfs:{order:['A','B','D','E','G'],path:['A','B','D','E','G']}};let index=-1;
+function draw(){let mode=$('walk-method').value,run=runs[mode],seen=run.order.slice(0,index+1),current=run.order[index],done=index===run.order.length-1;
+$('map').innerHTML=`<svg viewBox="0 0 650 310" role="img" aria-label="Mapa de entrada a salida con dos caminos. El camino del Pasillo tiene dos pasos; el del Patio tiene cuatro.">${edges.map(([a,b])=>`<line x1="${nodes[a][0]}" y1="${nodes[a][1]}" x2="${nodes[b][0]}" y2="${nodes[b][1]}" stroke="#a1b8ac" stroke-width="3"/>`).join('')}${Object.entries(nodes).map(([id,[x,y,name]])=>`<circle cx="${x}" cy="${y}" r="25" fill="${id===current?'#17675c':'#edf5ef'}" stroke="#17675c" stroke-width="${seen.includes(id)?5:1}"/><text x="${x}" y="${y+5}" text-anchor="middle" style="fill:${id===current?'white':'#213b43'}">${id}</text><text x="${x}" y="${y+47}" text-anchor="middle">${name}</text>`).join('')}</svg>`;
+$('walk-status').textContent=index<0?'Pulsa «Revisar siguiente lugar» para comenzar en la Entrada.':`Revisando: ${nodes[current][2]}. ${done?'Encontramos la Salida. Fin del recorrido.':mode==='bfs'?'Seguimos por niveles.':'Seguimos por la rama del Patio.'}`;
+$('walk-order').textContent='Orden de revisión: '+(seen.map(x=>nodes[x][2]).join(' → ')||'todavía no empezamos');
+$('walk-path').textContent=done?'Camino encontrado: '+run.path.map(x=>nodes[x][2]).join(' → ')+`. Tiene ${run.path.length-1} pasos. El orden de revisión y el camino encontrado no son lo mismo.`:'';$('walk-next').disabled=done;
+}
+$('walk-next').onclick=()=>{index++;draw();};$('walk-reset').onclick=()=>{index=-1;draw();};$('walk-method').onchange=()=>{index=-1;draw();};draw();
+function schedule(hour,method){if(hour===9||hour===11)return {valid:false,reason:hour===9?'El grupo tiene Inglés de 9:00 a 10:00.':'El salón está ocupado por otro grupo de 11:00 a 12:00.'};let holes=hour===10?0:3;return {valid:true,holes,delta:holes-2,accepted:method==='hc'?hour===10:true};}
+$('check').onclick=()=>{let hour=Number($('hour').value),method=$('method').value,r=schedule(hour,method);if(!r.valid){$('result').innerHTML=`<div class="notice warning"><strong>1. Revisar reglas: no cumple.</strong><p>${r.reason}</p><p><strong>Propuesta descartada.</strong> No pasamos a contar horas libres ni a decidir si conviene. El horario original permanece igual. Esto ocurre con los dos algoritmos.</p></div>`;return;}
+$('result').innerHTML=`<div class="notice"><p><strong>1. Revisar reglas: sí cumple.</strong> El grupo, el profesor y el salón están disponibles.</p><p><strong>2. Contar horas libres:</strong> antes había 2; la propuesta deja ${r.holes}. ${hour===10?'Las tres clases quedan seguidas, de 8:00 a 11:00.':'Quedarían libres las horas de 10:00 a 13:00, antes de Matemáticas.'}</p><p><strong>3. Decidir:</strong> ${method==='hc'?(hour===10?'HC acepta las 10:00: es el cambio válido que deja menos horas libres.':'HC rechaza las 13:00: aumentan las horas libres. Al comparar todas las opciones válidas, elegiría las 10:00.'):(hour===10?'SA acepta las 10:00 porque reducen las horas libres. No necesita un sorteo.':'SA puede aceptar las 13:00. En este ejemplo, con temperatura 4, la probabilidad es 0.779. Usamos un sorteo fijo de 0.30: acepta porque 0.30 es menor que 0.779. No se acepta siempre; con un sorteo de 0.90 se rechazaría.')}</p>${method==='sa'&&hour===13?'<p>El horario actual pasaría a tener 3 horas libres. El mejor registrado seguiría siendo el original, con 2. Aún no ha encontrado una mejora.</p>':''}</div>`;};
+['hour','method'].forEach(id=>$(id).onchange=()=>{$('result').textContent='Cambiaste la selección. Pulsa «Comprobar propuesta» para actualizar el resultado.';});
+const fields=['student','a1','a2','a3','a4','a6','a5'],key='busqueda-simple-v1';try{let saved=JSON.parse(localStorage.getItem(key)||'{}');fields.forEach(id=>{if(typeof saved[id]==='string')$(id).value=saved[id];});}catch{}
+fields.forEach(id=>$(id).addEventListener('input',()=>{try{localStorage.setItem(key,JSON.stringify(Object.fromEntries(fields.map(f=>[f,$(f).value]))));$('save').textContent='Respuestas guardadas en este navegador. Descarga el archivo para entregarlo.';}catch{$('save').textContent='Descarga tus respuestas antes de cerrar; no se pudieron guardar en este navegador.';}}));
+$('download').onclick=()=>{let text='DE BFS Y DFS A LA BÚSQUEDA LOCAL\n\n'+fields.map((id,i)=>(i?['','1. BFS y DFS','2. Restricciones','3. HC y SA','4. Relación entre algoritmos','5. Algoritmos genéticos','6. Observaciones del código'][i]:'Nombre y grupo')+'\n'+$(id).value).join('\n\n');let url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='mis_respuestas_busqueda.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);$('save').textContent='Archivo de respuestas preparado para descargar.';};$('print').onclick=()=>window.print();
+$('download-python').onclick=()=>{const url=URL.createObjectURL(new Blob([$('python-source').textContent],{type:'text/x-python;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='horarios_busqueda.py';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);$('python-status').textContent='Archivo horarios_busqueda.py preparado para descargar.';};
+</script></body></html>
