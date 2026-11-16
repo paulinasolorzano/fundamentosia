@@ -1,6 +1,6 @@
 # Algoritmo, datos y modelo · Unidad III
 
-Abre practica.html en el navegador y sigue «Continuar» al pie de cada paso. El índice «Ver pasos» del encabezado es opcional.
+Abre index.html en el navegador y sigue «Continuar» al pie de cada paso. El índice «Ver pasos» del encabezado es opcional.
 
 Para ejecutar Python, abre esta carpeta en Visual Studio Code. Usa Python 3.8 o posterior; no necesitas instalar paquetes. VS Code es el editor: Python ejecuta el programa.
 
