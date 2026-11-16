@@ -1,0 +1,42 @@
+{
+  "formato": "kmeans-frutas-v1",
+  "algoritmo": "K-means",
+  "caracteristicas": [
+    "tamano",
+    "dulzor"
+  ],
+  "escala": {
+    "min": 0,
+    "max": 10,
+    "tipo": "indices_sinteticos_sin_normalizar"
+  },
+  "metrica": "euclidiana",
+  "k": 2,
+  "centroides": [
+    [
+      1.6666666666666667,
+      2.0
+    ],
+    [
+      8.0,
+      7.666666666666667
+    ]
+  ],
+  "entrenamiento": {
+    "n_ejemplos": 6,
+    "iteraciones": 2,
+    "centroides_iniciales": [
+      [
+        1.0,
+        1.0
+      ],
+      [
+        8.0,
+        9.0
+      ]
+    ],
+    "sse": 9.333333333333334,
+    "inicializacion": "primer_punto_y_mas_lejanos",
+    "datos_sha256": "1e9268ffc19c017fa4d5b6490a6430da72909201b94b94f50f804f54200e9e19"
+  }
+}
